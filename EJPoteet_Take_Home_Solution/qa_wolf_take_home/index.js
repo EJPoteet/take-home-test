@@ -27,6 +27,13 @@ async function sortHackerNewsArticles() {
     return date;
   }
 
+  //Fetches the date from https://news.ycombinator.com/newest
+  async function fetchDate() {
+    articleDate = formatDate(await page.locator('.age').nth(currentArticleIndex).getAttribute('title'));
+    dates.push(articleDate);
+    currentArticleIndex++;
+  }
+
   //function to compare and log dates for chronological order. Note that the older date (i.e. the one from the lower article) should be passed in first.
   function compareDates(firstDate, secondDate, articleNumber) {
     if (firstDate < secondDate || +firstDate === +secondDate) {
@@ -46,14 +53,10 @@ async function sortHackerNewsArticles() {
     if (i % 30 === 0) {
       await page.getByText('More').last().click();
       currentArticleIndex = 0;
-      articleDate = formatDate(await page.locator('.age').nth(currentArticleIndex).getAttribute('title'));
-      dates.push(articleDate);
-      currentArticleIndex++;
+      await fetchDate();
     //otherwise we can just proceed to the next article, and grab the date
     } else {
-      articleDate = formatDate(await page.locator('.age').nth(currentArticleIndex).getAttribute('title'));
-      dates.push(articleDate);
-      currentArticleIndex++;
+      await fetchDate();
     }
   }
 
